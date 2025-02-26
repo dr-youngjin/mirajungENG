@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영어 문제 게임 - 월말평가 A type</title>
+    <style>
+        /* 전체 스타일 */
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden; /* 전체 페이지에서 가로 스크롤 제거 */
+        }
+        
+        /* 배너 스타일 */
+        .banner {
+            width: 100%;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .banner img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* 컨테이너 스타일 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 타이틀 스타일 */
+        .title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        /* 정보 패널 스타일 */
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .info-item {
+            text-align: center;
+            padding: 0 15px;
+        }
+        .info-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #7f8c8d;
+        }
+        .info-value {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        /* 시작 섹션 스타일 */
+        #startSection {
+            text-align: center;
+            padding: 40px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        .input-field {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            width: 300px;
+            margin-right: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus {
+            border-color: #2980b9;
+        }
+        
+        /* 버튼 스타일 */
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        /* 게임 섹션 스타일 */
+        #gameSection {
+            display: none;
+        }
+        .question-container {
+            display: flex;
+            margin-bottom: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            min-height: 500px;
+            overflow: hidden; /* 내용이 넘치지 않도록 */
+            overflow-x: hidden; /* 좌우 스크롤 제거 */
+        }
+        .passage {
+            flex: 0 0 38%; /* 비율 조정 */
+            padding-right: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            overflow-x: hidden; /* 좌우 스크롤 제거 */
+            border-right: 1px solid #eee;
+            display: none;
+        }
+        .passage img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
+        .question {
+            flex: 0 0 100%;
+            text-align: center;
+            padding: 15px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
+            overflow-x: hidden; /* 좌우 스크롤 제거 */
+        }
+        .question.with-passage {
+            flex: 0 0 58%; /* 비율 조정 */
+            margin: 0;
+        }
+        .question-number {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .question-images {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 800px;
+            overflow-x: hidden; /* 좌우 스크롤 제거 */
+        }
+        .question-images.scrollable {
+            max-height: calc(min(800px, 100%) * 2); /* 너비의 2배로 높이 설정 */
+            overflow-y: auto;
+        }
+        .question-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0; /* 마진 제거 */
+            padding: 0; /* 패딩 제거 */
+            border: none;
+            vertical-align: top; /* 이미지 간 간격 제거에 도움 */
+        }
+        
+        /* 객관식 옵션 스타일 */
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            width: 100%;
+        }
+        .option {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .option:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .option.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        .option.correct {
+            background-color: #27ae60;
+            color: white;
+        }
+        .option.incorrect {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* 주관식 입력 스타일 */
+        .input-answer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            width: 100%;
+        }
+        .answer-input {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            width: 250px;
+        }
+        
+        /* 피드백 스타일 */
+        .answer-feedback {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .correct-answer {
+            color: #27ae60;
+            background-color: rgba(39, 174, 96, 0.1);
+        }
+        .incorrect-answer {
+            color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        /* 결과 섹션 스타일 */
+        #resultSection {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        .result-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .result-info {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 배너 영역 -->
+    <div class="banner">
+        <img src="https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/ENGbanner.png?raw=true" alt="영어퀴즈 배너">
+    </div>
+    
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <div class="title">월말평가 A type</div>
+        
+        <!-- 시작 화면 -->
+        <div id="startSection">
+            <h2>이름을 입력하고 게임을 시작하세요</h2>
+            <div>
+                <input type="text" id="playerName" class="input-field" placeholder="이름을 입력하세요">
+                <button id="startButton" class="btn">게임시작</button>
+            </div>
+        </div>
+        
+        <!-- 게임 화면 -->
+        <div id="gameSection">
+            <div class="info-panel">
+                <div class="info-item">
+                    <div class="info-label">남은 기회</div>
+                    <div class="info-value" id="chances">3</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">점수</div>
+                    <div class="info-value" id="score">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">경과시간</div>
+                    <div class="info-value" id="timer">00:00</div>
+                </div>
+            </div>
+            
+            <!-- 문제 컨테이너 -->
+            <div id="questionContainer" class="question-container">
+                <!-- 지문 영역 -->
+                <div id="passage" class="passage"></div>
+                
+                <!-- 문제 영역 -->
+                <div id="question" class="question">
+                    <div id="questionNumber" class="question-number">문제 1</div>
+                    
+                    <!-- 모든 문제 이미지를 담는 컨테이너 -->
+                    <div id="questionImages" class="question-images">
+                        <!-- 이미지들은 JavaScript로 동적 추가 -->
+                    </div>
+                    
+                    <!-- 객관식 옵션 -->
+                    <div id="multipleChoice" class="options">
+                        <div class="option" data-option="1">1</div>
+                        <div class="option" data-option="2">2</div>
+                        <div class="option" data-option="3">3</div>
+                        <div class="option" data-option="4">4</div>
+                        <div class="option" data-option="5">5</div>
+                    </div>
+                    
+                    <!-- 주관식 입력 -->
+                    <div id="shortAnswer" class="input-answer" style="display: none;">
+                        <input type="text" id="answerInput" class="answer-input" placeholder="답을 입력하세요">
+                        <button id="checkButton" class="btn">확인</button>
+                    </div>
+                    
+                    <!-- 정답 피드백 -->
+                    <div id="answerFeedback" class="answer-feedback"></div>
+                    
+                    <!-- 다음 문제 버튼 -->
+                    <button id="nextButton" class="btn" disabled>다음문제</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 결과 화면 -->
+        <div id="resultSection">
+            <div class="result-title">게임 종료</div>
+            <div class="result-info" id="finalScore"></div>
+            <div class="result-info" id="finalTime"></div>
+            <button id="retryButton" class="btn">다시하기</button>
+            <button id="submitButton" class="btn">전송하기</button>
+            <div id="response"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 전역 변수
+        let currentQuestion = 1;
+        let score = 0;
+        let chances = 3;
+        let timer = null;
+        let startTime = 0;
+        let elapsedTime = 0;
+        let playerName = "";
+        let gameOver = false;
+        let questions = [];
+        let passages = {
+            "Z41-42": {
+                url: "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/Z41-42.png?raw=true",
+                questions: [41, 42]
+            },
+            "Z43-45": {
+                url: "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/Z43-45.png?raw=true",
+                questions: [43, 44, 45]
+            }
+        };
+        
+        // 문제 데이터 초기화
+        function initQuestions() {
+            questions = [
+                {
+                    id: 1,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/1.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 2,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/2.png?raw=true"
+                    ],
+                    answer: "3",
+                    type: "객관식"
+                },
+                {
+                    id: 3,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/3.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 4,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/4.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 5,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/5.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 6,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/6.png?raw=true"
+                    ],
+                    answer: "1",
+                    type: "객관식"
+                },
+                {
+                    id: 7,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/7.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 8,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/8.png?raw=true"
+                    ],
+                    answer: "3",
+                    type: "객관식"
+                },
+                {
+                    id: 9,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/9.png?raw=true"
+                    ],
+                    answer: "1",
+                    type: "객관식"
+                },
+                {
+                    id: 10,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/10.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 11,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/11.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 12,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/12.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 13,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/13.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 14,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/14.png?raw=true"
+                    ],
+                    answer: "3",
+                    type: "객관식"
+                },
+                {
+                    id: 15,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/15.png?raw=true"
+                    ],
+                    answer: "1",
+                    type: "객관식"
+                },
+                {
+                    id: 16,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/16.png?raw=true"
+                    ],
+                    answer: "1",
+                    type: "객관식"
+                },
+                {
+                    id: 17,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B1-17.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/17.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 18,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B18.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/18.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 19,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/19.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 20,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/20.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 21,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/21.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/21-1.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 22,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/22.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 23,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/23.png?raw=true"
+                    ],
+                    answer: "3",
+                    type: "객관식"
+                },
+                {
+                    id: 24,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/24.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/24-1.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 25,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/25.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 26,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/26.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 27,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/27.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/27-1.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 28,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/28.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/28-1.png?raw=true"
+                    ],
+                    answer: "3",
+                    type: "객관식"
+                },
+                {
+                    id: 29,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/29.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 30,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/30.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/30-1.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 31,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B31-34.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/31-1.png?raw=true"
+                    ],
+                    answer: "awareness",
+                    type: "주관식"
+                },
+                {
+                    id: 32,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B31-34.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/32.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/32-1.png?raw=true"
+                    ],
+                    answer: "1",
+                    type: "객관식"
+                },
+                {
+                    id: 33,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B31-34.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/33.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 34,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B31-34.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/34.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 35,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/35.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/35-1.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 36,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B36-37.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/36.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 37,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B36-37.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/37.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/37-1.png?raw=true"
+                    ],
+                    answer: "2",
+                    type: "객관식"
+                },
+                {
+                    id: 38,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B38-39.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/38.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 39,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/B38-39.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/39.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 40,
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/40.png?raw=true",
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/40-1.png?raw=true"
+                    ],
+                    answer: "1",
+                    type: "객관식"
+                },
+                {
+                    id: 41,
+                    passage: "Z41-42",
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/41.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 42,
+                    passage: "Z41-42",
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/42.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 43,
+                    passage: "Z43-45",
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/43.png?raw=true"
+                    ],
+                    answer: "4",
+                    type: "객관식"
+                },
+                {
+                    id: 44,
+                    passage: "Z43-45",
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/44.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                },
+                {
+                    id: 45,
+                    passage: "Z43-45",
+                    images: [
+                        "https://github.com/dr-youngjin/image-file/blob/main/%EC%98%81%EC%96%B4%ED%80%B4%EC%A6%88/45.png?raw=true"
+                    ],
+                    answer: "5",
+                    type: "객관식"
+                }
+            ];
+        }
+        
+        // 게임 초기화
+        function resetGame() {
+            currentQuestion = 1;
+            score = 0;
+            chances = 3;
+            elapsedTime = 0;
+            gameOver = false;
+            
+            // UI 초기화
+            scoreDisplay.textContent = score;
+            chancesDisplay.textContent = chances;
+            timerDisplay.textContent = "00:00";
+        }
+        
+        // 타이머 시작
+        function startTimer() {
+            startTime = Date.now();
+            timer = setInterval(updateTimer, 1000);
+        }
+        
+        // 타이머 업데이트
+        function updateTimer() {
+            elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 타이머 중지
+        function stopTimer() {
+            clearInterval(timer);
+        }
+        
+        // 이미지 총 높이 계산
+        function calculateImagesHeight(imgElements) {
+            let totalHeight = 0;
+            for (let i = 0; i < imgElements.length; i++) {
+                totalHeight += imgElements[i].height;
+            }
+            return totalHeight;
+        }
+        
+        // 이미지 비율 확인 및 스크롤 여부 결정
+        function shouldAddScroll(imagesContainer, imgElements) {
+            if (imgElements.length === 0) return false;
+            
+            // 이미지 로드 후 비율 계산 및 스크롤 적용
+            const totalWidth = imagesContainer.clientWidth;
+            const totalHeight = calculateImagesHeight(imgElements);
+            
+            // 1:2 비율 이상이면 스크롤 추가 (세로가 가로의 2배보다 길면)
+            return totalHeight > totalWidth * 2;
+        }
+        
+        // 문제 로드
+        function loadQuestion(questionId) {
+            // 현재 문제 가져오기
+            const question = questions.find(q => q.id === questionId);
+            if (!question) {
+                endGame(true);
+                return;
+            }
+            
+            // 문제 번호 표시
+            questionNumberDisplay.textContent = `문제 ${question.id}`;
+            
+            // 지문(passage) 처리
+            if (question.passage) {
+                passageElement.style.display = 'block';
+                passageElement.innerHTML = `<img src="${passages[question.passage].url}" alt="지문" style="display:block; width:100%; margin:0; padding:0;">`;
+                questionElement.classList.add('with-passage');
+                questionContainer.style.justifyContent = 'space-between';
+            } else {
+                passageElement.style.display = 'none';
+                questionElement.classList.remove('with-passage');
+                questionContainer.style.justifyContent = 'center';
+            }
+            
+            // 문제 이미지 로드
+            const questionImagesContainer = document.getElementById('questionImages');
+            questionImagesContainer.innerHTML = '';  // 이전 이미지 제거
+            questionImagesContainer.classList.remove('scrollable');
+            
+            // 이미지 요소 생성 및 추가
+            const imgElements = [];
+            question.images.forEach(imgUrl => {
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = `문제 ${question.id} 이미지`;
+                img.className = 'question-image';
+                questionImagesContainer.appendChild(img);
+                
+                // 이미지 로드 완료 후 스크롤 여부 확인
+                img.onload = function() {
+                    imgElements.push(img);
+                    if (imgElements.length === question.images.length) {
+                        // 모든 이미지가 로드되었을 때
+                        if (shouldAddScroll(questionImagesContainer, imgElements)) {
+                            questionImagesContainer.classList.add('scrollable');
+                            // 컨테이너 높이를 너비의 2배로 설정하여 1:2 비율 유지
+                            questionImagesContainer.style.height = (questionImagesContainer.clientWidth * 2) + 'px';
+                        } else {
+                            questionImagesContainer.style.height = 'auto';
+                        }
+                    }
+                };
+            });
+            
+            // 객관식 vs 주관식 처리
+            if (question.type === '객관식') {
+                multipleChoiceElement.style.display = 'flex';
+                shortAnswerElement.style.display = 'none';
+                
+                // 모든 옵션 초기화
+                const options = document.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.classList.remove('selected', 'correct', 'incorrect');
+                });
+            } else { // 주관식
+                multipleChoiceElement.style.display = 'none';
+                shortAnswerElement.style.display = 'flex';
+                answerInputElement.value = '';
+            }
+            
+            // 피드백 초기화
+            answerFeedbackElement.textContent = '';
+            answerFeedbackElement.className = 'answer-feedback';
+            
+            // 다음 버튼 비활성화
+            nextButton.disabled = true;
+        }
+        
+        // 객관식 옵션 선택
+        function selectOption(optionElement) {
+            // 이미 선택한 상태에서는 추가 선택 못하게 방지
+            if (nextButton.disabled === false) {
+                return;
+            }
+            
+            // 현재 문제 가져오기
+            const question = questions.find(q => q.id === currentQuestion);
+            const selectedOption = optionElement.dataset.option;
+            
+            // 이미 선택된 옵션이 있는지 확인
+            const previousSelected = document.querySelector('.option.selected');
+            if (previousSelected) {
+                previousSelected.classList.remove('selected');
+            }
+            
+            // 선택한 옵션 표시
+            optionElement.classList.add('selected');
+            
+            // 정답 확인
+            checkAnswer(selectedOption);
+        }
+        
+        // 주관식 답 확인
+        function checkShortAnswer() {
+            const userAnswer = answerInputElement.value.trim().toLowerCase();
+            if (!userAnswer) {
+                alert('답을 입력해주세요.');
+                return;
+            }
+            checkAnswer(userAnswer);
+        }
+        
+        // 답 확인
+        function checkAnswer(userAnswer) {
+            const question = questions.find(q => q.id === currentQuestion);
+            const correctAnswer = question.answer.toString().toLowerCase();
+            
+            // 정답 확인
+            if (userAnswer.toLowerCase() === correctAnswer) {
+                // 정답인 경우
+                score += 10;
+                scoreDisplay.textContent = score;
+                
+                if (question.type === '객관식') {
+                    document.querySelector(`.option[data-option="${userAnswer}"]`).classList.add('correct');
+                }
+                
+                answerFeedbackElement.textContent = '정답입니다!';
+                answerFeedbackElement.className = 'answer-feedback correct-answer';
+            } else {
+                // 오답인 경우
+                chances--;
+                chancesDisplay.textContent = chances;
+                
+                if (question.type === '객관식') {
+                    document.querySelector(`.option[data-option="${userAnswer}"]`).classList.add('incorrect');
+                    document.querySelector(`.option[data-option="${correctAnswer}"]`).classList.add('correct');
+                }
+                
+                answerFeedbackElement.textContent = `오답입니다. 정답은 ${correctAnswer} 입니다.`;
+                answerFeedbackElement.className = 'answer-feedback incorrect-answer';
+                
+                // 기회가 없는 경우 게임 종료
+                if (chances === 0) {
+                    setTimeout(() => {
+                        endGame(false);
+                    }, 1500);
+                    return;
+                }
+            }
+            
+            // 다음 버튼 활성화
+            nextButton.disabled = false;
+        }
+        
+        // 다음 문제로 넘어가기
+        function nextQuestion() {
+            currentQuestion++;
+            
+            // 모든 문제를 다 풀었는지 확인
+            if (currentQuestion > questions.length) {
+                endGame(true);
+                return;
+            }
+            
+            loadQuestion(currentQuestion);
+        }
+        
+        // 게임 종료
+        function endGame(completed) {
+            gameOver = true;
+            stopTimer();
+            
+            // 결과 표시
+            gameSection.style.display = 'none';
+            resultSection.style.display = 'block';
+            
+            finalScoreDisplay.textContent = `최종 점수: ${score}점`;
+            
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            finalTimeDisplay.textContent = `경과 시간: ${minutes}분 ${seconds}초`;
+            
+            // 완료 여부에 따라 버튼 표시
+            if (!completed) {
+                retryButton.style.display = 'inline-block';
+            } else {
+                retryButton.style.display = 'none';
+            }
+        }
+        
+        // 게임 다시 시작
+        function restartGame() {
+            resultSection.style.display = 'none';
+            gameSection.style.display = 'block';
+            
+            resetGame();
+            startTimer();
+            loadQuestion(currentQuestion);
+        }
+        
+        // 결과 제출
+        function submitResults() {
+            const gameTitle = "월말평가 A type";
+            saveData(gameTitle, playerName, score, elapsedTime);
+            submitButton.disabled = true;  // 중복 제출 방지
+        }
+        
+        // 데이터 저장 및 서버 전송
+        function saveData(game, name, score, elapsedTime) {
+            const FUNCTION_URL = "https://us-central1-record-f420d.cloudfunctions.net/report";
+
+            const requestData = {
+                game,
+                name,
+                score: parseInt(score, 10),
+                elapsedTime: parseInt(elapsedTime, 10)
+            };
+
+            try {
+                fetch(FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => {
+                    return response.json().then(data => {
+                        if (response.ok) {
+                            document.getElementById('response').innerText = 
+                                `성공: ${JSON.stringify(data, null, 2)}`;
+                        } else {
+                            document.getElementById('response').innerText = 
+                                `오류: ${JSON.stringify(data, null, 2)}`;
+                        }
+                        submitButton.disabled = false;  // 버튼 다시 활성화
+                    });
+                })
+                .catch(error => {
+                    console.error('요청 실패:', error);
+                    document.getElementById('response').innerText = 
+                        `네트워크 오류: ${error.message}`;
+                    submitButton.disabled = false;  // 버튼 다시 활성화
+                });
+            } catch (error) {
+                console.error('요청 실패:', error);
+                document.getElementById('response').innerText = 
+                    `네트워크 오류: ${error.message}`;
+                submitButton.disabled = false;  // 버튼 다시 활성화
+            }
+        }
+        
+        // 요소 참조
+        const startSection = document.getElementById('startSection');
+        const gameSection = document.getElementById('gameSection');
+        const resultSection = document.getElementById('resultSection');
+        const playerNameInput = document.getElementById('playerName');
+        const startButton = document.getElementById('startButton');
+        const chancesDisplay = document.getElementById('chances');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const questionContainer = document.getElementById('questionContainer');
+        const passageElement = document.getElementById('passage');
+        const questionElement = document.getElementById('question');
+        const questionNumberDisplay = document.getElementById('questionNumber');
+        const multipleChoiceElement = document.getElementById('multipleChoice');
+        const shortAnswerElement = document.getElementById('shortAnswer');
+        const answerInputElement = document.getElementById('answerInput');
+        const checkButton = document.getElementById('checkButton');
+        const answerFeedbackElement = document.getElementById('answerFeedback');
+        const nextButton = document.getElementById('nextButton');
+        const retryButton = document.getElementById('retryButton');
+        const submitButton = document.getElementById('submitButton');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const finalTimeDisplay = document.getElementById('finalTime');
+        const responseDisplay = document.getElementById('response');
+        
+        // 이벤트 리스너 등록
+        document.addEventListener('DOMContentLoaded', function() {
+            // 게임 시작 버튼
+            startButton.addEventListener('click', function() {
+                playerName = playerNameInput.value.trim();
+                if (!playerName) {
+                    alert('이름을 입력해주세요.');
+                    return;
+                }
+                
+                startSection.style.display = 'none';
+                gameSection.style.display = 'block';
+                
+                initQuestions();
+                resetGame();
+                startTimer();
+                loadQuestion(currentQuestion);
+            });
+            
+            // 다음 문제 버튼
+            nextButton.addEventListener('click', nextQuestion);
+            
+            // 다시 시작 버튼
+            retryButton.addEventListener('click', restartGame);
+            
+            // 결과 제출 버튼
+            submitButton.addEventListener('click', submitResults);
+            
+            // 주관식 확인 버튼
+            checkButton.addEventListener('click', checkShortAnswer);
+            
+            // 주관식 입력 Enter 키 처리
+            answerInputElement.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkShortAnswer();
+                }
+            });
+            
+            // 객관식 옵션 클릭 이벤트
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    selectOption(this);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
